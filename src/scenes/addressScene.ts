@@ -1,5 +1,5 @@
-// src/scenes/addressScene.ts
-import { BotContext, Initialize } from "../types/customContext";
+7// src/scenes/addressScene.ts
+import { BotContext } from "../types/customContext";
 import { BaseScene } from './baseScene';
 import { TypeScene } from "../config/constants";
 import { formatCurrency, createInlineButtons } from '../utils/helpers';
@@ -13,44 +13,37 @@ export class AddressScene extends BaseScene {
 
     override async enterScene(ctx: BotContext) {
         super.enterScene(ctx);
-        const { addressId } = this.initialize.initParams as {addressId: string};
-        const { ...address } = findAddressByID(addressId);
+        const addressId = this.contextData.id;
+        if (addressId) {
+            const { ...address } = findAddressByID(addressId);
 
-        await this.setButtons(ctx, `Адрес: ${address.address}`, createInlineButtons([this.btnGoHome]));
-        await this.showButtons(ctx);
+            await this.setButtons(ctx, `Адрес: ${address.address}`, createInlineButtons([this.btnGoHome]));
+            await this.showButtons(ctx);
 
-        const accounts = getAccountByAddress(ctx.msg.chat.id, addressId);
+            const accounts = getAccountByAddress(ctx.msg.chat.id, this.contextData.id);
 
-        accounts.forEach((async acc => {
-            const foundInvoices = findInvoices(acc.org_id, acc.account);
-            if (foundInvoices !== undefined && foundInvoices.length > 0) {
-                const buttons = createInlineButtons(
-                    foundInvoices.map(function(item){ 
-                        return {text: `${item.type} ${formatCurrency(item.amount)} за ${item.period}`, 
-                        callback_data: `invoice|${item.id}`}}
-                    )
-                );
-                await this.setButtons(ctx, `ЛС: ${acc.account}`, buttons);
-            };
-        }));
+            accounts.forEach((async acc => {
+                const foundInvoices = findInvoices(acc.org_id, acc.account);
+                if (foundInvoices !== undefined && foundInvoices.length > 0) {
+                    const buttons = createInlineButtons(
+                        foundInvoices.map(function(item){ 
+                            return {text: `${item.type} ${formatCurrency(item.amount)} за ${item.period}`, 
+                            callback_data: `invoice|${item.id}`}}
+                        )
+                    );
+                    await this.setButtons(ctx, `ЛС: ${acc.account}`, buttons);
+                };
+            }));
 
-        await this.showButtons(ctx);
+            await this.showButtons(ctx);
 
-        this.action(/invoice\|.+/, async (ctx) => {
-            this.leave();
-            const invoiceId = ctx.match.input.split('|')[1];
-            this.initialize.priorScenes.push({nameScene: this.id as TypeScene, initParams: this.initialize.initParams as {addressId: string}});
-            const initialize: Initialize = {
-                initParams: {invoiceId: invoiceId},
-                priorScenes: this.initialize.priorScenes
-            };
-            await ctx.scene.enter(TypeScene.InvoiceScene, initialize);
-        });
+            this.action(/invoice\|.+/, async (ctx) => {
+                const invoiceId = ctx.match.input.split('|')[1];
+                this.pushScene(); // push this scene info into stack of scenes
+                await ctx.scene.enter(TypeScene.InvoiceScene, { id: invoiceId });
+            });
+        } else {
+            throw new Error('Got empty address id!');
+        }
     }
-
-    // Method to transition to main scene
-    override async goHome(ctx: BotContext) {
-        await ctx.scene.enter(TypeScene.MainScene);
-    }
-    
 }

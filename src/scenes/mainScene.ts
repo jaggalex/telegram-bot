@@ -1,6 +1,6 @@
 // src/scenes/mainScene.ts
 import { BaseScene } from './baseScene';
-import { Initialize, BotContext } from '../types/customContext';
+import { BotContext } from '../types/customContext';
 import { createInlineButtons } from '../utils/helpers';
 import { TypeScene } from '../config/constants';
 import { getAddressList, IAddress } from '../utils/dataProvider';
@@ -21,9 +21,9 @@ export class MainScene extends BaseScene {
             const btn = addresses.map(function(item){ 
                 return {text: item.address, callback_data: `address|${item.id}`}
             })
-            const buttons = createInlineButtons(btn);
+            const buttons = createInlineButtons([...btn, {text: 'Bring back', callback_data: `beback`}]);
 
-            await this.setButtons(ctx, 'Адреса:', buttons);
+            await this.setButtons(ctx, 'Адреса:', [...buttons, ]);
             await this.showButtons(ctx);
 
             await this.setButtons(ctx, 'Добавить еще', 
@@ -33,33 +33,17 @@ export class MainScene extends BaseScene {
 
             this.action(/address\|.+/, async (ctx) => {
                 const addressId = ctx.match.input.split('|')[1];
-                const initialize: Initialize = {
-                    initParams: { addressId: addressId },
-                    priorScenes: [{ nameScene: TypeScene.MainScene, initParams: {} }]
-                };
-                await ctx.scene.enter(TypeScene.AddressScene, initialize);
+                this.pushScene(); // push this scene info into stack of scenes
+                await ctx.scene.enter(TypeScene.AddressScene,  { id: addressId });
             });
 
             this.action('find_org', async () => {
-                const initialize: Initialize = {
-                    initParams: {},
-                    priorScenes: [{ nameScene: TypeScene.MainScene, initParams: {} }]
-                };
-                await ctx.scene.enter(TypeScene.FindOrgScene, initialize);
+                this.pushScene(); // push this scene info into stack of scenes
+                await ctx.scene.enter(TypeScene.FindOrgScene);
             });
-                        
-            this.action('find_org', async (ctx) => {
-//                this.leave();
-                const addressId = ctx.match.input.split('|')[1];
-                const initialize: Initialize = {
-                    initParams: { addressId: addressId },
-                    priorScenes: [{ nameScene: TypeScene.MainScene, initParams: {} }]
-                };
-                await ctx.scene.enter(TypeScene.AddressScene, initialize);
-            });
-
-    } else { ctx.reply('Chat ID is undefined!') };
+        } else { 
+            ctx.reply('Chat ID is undefined!') 
+        };
     }
-
 }
 

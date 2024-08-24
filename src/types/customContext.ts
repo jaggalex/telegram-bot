@@ -6,8 +6,13 @@ import { TypeScene } from '../config/constants';
 
 
 export interface SceneContext {
-    scene: TypeScene;
-    context: {};
+    sceneName: TypeScene;
+    contextData: {};
+}
+
+export interface ctxScene {
+    nameScene: TypeScene;
+    initParams: {};
 }
 
 export interface Data {
@@ -15,15 +20,7 @@ export interface Data {
     scenes: Array<SceneContext>;
 }
 
-export interface PriorScene {
-    nameScene: TypeScene;
-    initParams: {};
-}
 
-export interface Initialize {
-    initParams: {};
-    priorScenes: PriorScene[];
-}
 
 interface SceneSession extends Scenes.SceneSessionData {
     awaitingAccountNumber?: boolean;

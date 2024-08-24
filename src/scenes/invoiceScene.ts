@@ -12,7 +12,7 @@ export class InvoiceScene extends BaseScene {
 
     override async enterScene(ctx: BotContext) {
         super.enterScene(ctx);
-        const { invoiceId } = this.initialize.initParams as { invoiceId: string };
+        const invoiceId =  this.contextData.id;
         const { ...invoice } = findInvoiceByID(invoiceId);
 
         if (invoice !== undefined) {

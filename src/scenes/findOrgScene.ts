@@ -11,7 +11,6 @@ const findOrgScene = new Scenes.WizardScene<BotContext>(
         const findMessage = await ctx.reply(
             `Поиск организации\nвведите ИНН или наименование:`);
         return ctx.wizard.next();
-
     },
     async (ctx) => {
         let messages: Array<number> = [];
@@ -43,18 +42,7 @@ const findOrgScene = new Scenes.WizardScene<BotContext>(
 findOrgScene.action(/organization\|.+/, async (ctx) => {
     const orgID = ctx.match.input.split('|')[1];
     await ctx.scene.enter(TypeScene.FindAccountScene, { orgID: orgID });
-    ctx.data.scenes.push({ scene: TypeScene.FindOrgScene, context: {} });
-});
-
-findOrgScene.action('back', async (ctx) => {
-    const prev_scene = ctx.data.scenes.pop();
-    if (prev_scene)
-        await ctx.scene.enter(prev_scene.scene, prev_scene.context);
-    else await ctx.scene.enter(TypeScene.MainScene);
-});
-
-findOrgScene.action('home', async (ctx) => {
-    await ctx.scene.enter(TypeScene.MainScene);
+    
 });
 
 export default findOrgScene;

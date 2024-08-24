@@ -1,38 +1,37 @@
 // src/scenes/baseScene.ts
-import { Scenes} from 'telegraf';
+import { Scenes } from 'telegraf';
 import { Message } from 'telegraf/typings/core/types/typegram';
-import { BotContext, Initialize, PriorScene } from '../types/customContext';
+import { BotContext, SceneContext } from '../types/customContext';
 import { TypeScene,  BUTTON_TEXTS } from '../config/constants';
-
-const mainScene: PriorScene[] = [{nameScene: TypeScene.MainScene, initParams: {}}];
+import { SceneComposer } from '../middleware/composer';
 
 export class BaseScene extends Scenes.BaseScene<BotContext> {
+    private composer: SceneComposer;
     promises: Promise<Message.TextMessage>[] = [];
     messageIds: Array<number> = [];
-    initialize: Initialize = {initParams: {}, priorScenes: []};
+    contextData = {id: ''};
+
     btnGoBack = {text: BUTTON_TEXTS.BACK, callback_data: 'back'};
     btnGoHome = {text: BUTTON_TEXTS.HOME, callback_data: 'home'};
     btnsGoBackGoHome = [this.btnGoBack, this.btnGoHome];
 
     constructor(sceneId: string) {
         super(sceneId);
+        this.composer = SceneComposer.getInstance();
         this.enter((ctx) => this.enterScene(ctx));
         this.leave((ctx) => this.leaveScene(ctx));
+        this.use(this.composer.middleware());
     }
     
     protected async enterScene(ctx: BotContext) {
-        const { initParams, priorScenes } = ctx.scene.state as { initParams?: {}, priorScenes?: [{nameScene: TypeScene, initParams: {}}]};
-        this.initialize.priorScenes = priorScenes || mainScene;
-        this.initialize.initParams = initParams || {};
-
-        this.action('back', async () => {
-            await this.goToPriorScene(ctx);
-        });
-        this.action('home', async () => {
-            await this.goHome(ctx);
-        });
+        this.contextData = ctx.scene.state as {id: string};
     }
     
+    protected async pushScene() {
+        const scene = {sceneName: this.id as TypeScene, contextData: this.contextData as {id: string}}
+        this.composer.pushScene(scene);
+    }
+
     protected async leaveScene(ctx: BotContext) {
         while (this.messageIds.length > 0) {
             let id = this.messageIds.pop();
@@ -61,25 +60,4 @@ export class BaseScene extends Scenes.BaseScene<BotContext> {
         )
         this.messageIds.push(message.message_id);
     }
-    
-    // Method to transition to prior scene
-    protected async goToPriorScene(ctx: BotContext) {
-        const scene = this.initialize.priorScenes.pop();
-        const sceneId = scene?.nameScene || TypeScene.MainScene;
-        const initialize: Initialize = {
-            initParams: scene?.initParams || {},
-            priorScenes: this.initialize.priorScenes
-        };
-        await ctx.scene.enter(sceneId , initialize);
-    }
-
-    // Method to transition to main scene
-    protected async goHome(ctx: BotContext) {
-        const initialize: Initialize = {
-            initParams: {},
-            priorScenes: mainScene
-        };
-        await ctx.scene.enter(TypeScene.MainScene, initialize);
-    }
-    
 }

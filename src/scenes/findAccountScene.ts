@@ -48,18 +48,11 @@ const findAccountScene = new Scenes.WizardScene<BotContext>(
 findAccountScene.action(/invoice\|.+/, async (ctx) => {
     const invID = ctx.match.input.split('|')[1];
     await ctx.scene.enter(TypeScene.InvoiceScene, { invoiceID: invID });
-    ctx.data.scenes.push({ scene: TypeScene.FindAccountScene, context: {} });
 });
 
-findAccountScene.action('back', async (ctx) => {
-    const prev_scene = ctx.data.scenes.pop();
-    if (prev_scene)
-        await ctx.scene.enter(prev_scene.scene, prev_scene.context);
-    else await ctx.scene.enter(TypeScene.MainScene);
-});
-
+/*
 findAccountScene.action('home', async (ctx) => {
     await ctx.scene.enter(TypeScene.MainScene);
 });
-
+*/
 export default findAccountScene;
