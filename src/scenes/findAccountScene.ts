@@ -3,9 +3,7 @@ import { Scenes, Markup } from 'telegraf';
 import { BotContext } from '../types/customContext';
 import { InlineKeyboardButton } from 'telegraf/types';
 import { findInvoices } from '../utils/dataProvider';
-//import { findAccount, IOrganization, IInvoice } from '../dataProvider';
 import { TypeScene } from '../config/constants';
-//import { btnBottom } from '../menu';
 
 const findAccountScene = new Scenes.WizardScene<BotContext>(
     TypeScene.FindAccountScene,
@@ -41,18 +39,12 @@ const findAccountScene = new Scenes.WizardScene<BotContext>(
             ));
             messages.push(orgMessage.message_id);
         }
-        //await saveMessages(ctx, messages);
     }
 );
 
 findAccountScene.action(/invoice\|.+/, async (ctx) => {
-    const invID = ctx.match.input.split('|')[1];
-    await ctx.scene.enter(TypeScene.InvoiceScene, { invoiceID: invID });
+    const invId = ctx.match.input.split('|')[1];
+    await ctx.scene.enter(TypeScene.InvoiceScene, { id: invId });
 });
 
-/*
-findAccountScene.action('home', async (ctx) => {
-    await ctx.scene.enter(TypeScene.MainScene);
-});
-*/
 export default findAccountScene;

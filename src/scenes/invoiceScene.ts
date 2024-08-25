@@ -7,8 +7,8 @@ import { findInvoiceByID } from '../utils/dataProvider'
 
 export class InvoiceScene extends BaseScene {
     constructor() {
-        super(TypeScene.InvoiceScene);
-    }
+        super(TypeScene.InvoiceScene, async (ctx) => { return ctx.wizard.next() });
+    }    
 
     override async enterScene(ctx: BotContext) {
         super.enterScene(ctx);

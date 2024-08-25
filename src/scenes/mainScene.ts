@@ -8,7 +8,7 @@ import { getAddressList, IAddress } from '../utils/dataProvider';
 export class MainScene extends BaseScene {
 
     constructor() {
-        super(TypeScene.MainScene);
+        super(TypeScene.MainScene, async (ctx) => { return ctx.wizard.next() });
     }
     
     override async enterScene(ctx: BotContext) {
@@ -21,7 +21,7 @@ export class MainScene extends BaseScene {
             const btn = addresses.map(function(item){ 
                 return {text: item.address, callback_data: `address|${item.id}`}
             })
-            const buttons = createInlineButtons([...btn, {text: 'Bring back', callback_data: `beback`}]);
+            const buttons = createInlineButtons(btn);
 
             await this.setButtons(ctx, 'Адреса:', [...buttons, ]);
             await this.showButtons(ctx);
@@ -38,7 +38,7 @@ export class MainScene extends BaseScene {
             });
 
             this.action('find_org', async () => {
-                this.pushScene(); // push this scene info into stack of scenes
+                this.pushScene(); 
                 await ctx.scene.enter(TypeScene.FindOrgScene);
             });
         } else { 

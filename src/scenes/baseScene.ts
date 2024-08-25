@@ -1,11 +1,12 @@
 // src/scenes/baseScene.ts
-import { Scenes } from 'telegraf';
+import { Scenes, Middleware } from 'telegraf';
+import { SceneOptions } from 'telegraf/typings/scenes/base';
 import { Message } from 'telegraf/typings/core/types/typegram';
 import { BotContext, SceneContext } from '../types/customContext';
 import { TypeScene,  BUTTON_TEXTS } from '../config/constants';
 import { SceneComposer } from '../middleware/composer';
 
-export class BaseScene extends Scenes.BaseScene<BotContext> {
+export class BaseScene extends Scenes.WizardScene<BotContext> { // Scenes.BaseScene<BotContext> {
     private composer: SceneComposer;
     promises: Promise<Message.TextMessage>[] = [];
     messageIds: Array<number> = [];
@@ -15,8 +16,8 @@ export class BaseScene extends Scenes.BaseScene<BotContext> {
     btnGoHome = {text: BUTTON_TEXTS.HOME, callback_data: 'home'};
     btnsGoBackGoHome = [this.btnGoBack, this.btnGoHome];
 
-    constructor(sceneId: string) {
-        super(sceneId);
+    constructor(sceneId: string, ...steps: Array<Middleware<BotContext>>) {
+        super(sceneId, ...steps);
         this.composer = SceneComposer.getInstance();
         this.enter((ctx) => this.enterScene(ctx));
         this.leave((ctx) => this.leaveScene(ctx));
@@ -28,7 +29,7 @@ export class BaseScene extends Scenes.BaseScene<BotContext> {
     }
     
     protected async pushScene() {
-        const scene = {sceneName: this.id as TypeScene, contextData: this.contextData as {id: string}}
+        const scene = {sceneName: this.id as TypeScene, contextData: this.contextData}
         this.composer.pushScene(scene);
     }
 
