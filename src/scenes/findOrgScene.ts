@@ -1,25 +1,13 @@
 // src/scenes/findOrgScene.ts
-import { Scenes, Markup } from 'telegraf';
-import { BotContext } from '../types/customContext';
-import { formatCurrency, createInlineButtons } from '../utils/helpers';
+import { createInlineButtons } from '../utils/helpers';
 import { findOrg } from '../utils/dataProvider';
 import { TypeScene } from '../config/constants';
 import { BaseScene } from './baseScene';
-
 
 export class FindOrgScene extends BaseScene {
     constructor() {
         super(
             TypeScene.FindOrgScene,
-            async (ctx) => {
-                return ctx.wizard.next();
-            },
-            async (ctx) => {
-                const findMessage = await ctx.reply(
-                    `Поиск организации\nвведите ИНН или наименование:`);
-                this.messageIds.push(findMessage.message_id);
-                return ctx.wizard.next();
-            },
             async (ctx) => {
                 let messages: Array<number> = [];
                 const userInput = (ctx.message as { text: string })?.text;
@@ -43,15 +31,18 @@ export class FindOrgScene extends BaseScene {
                 }
             }
         );
+
         this.action(/organization\|.+/, async (ctx) => {
             const orgID = ctx.match.input.split('|')[1];
             this.pushScene(); // push this scene info into stack of scenes
             await ctx.scene.enter(TypeScene.FindAccountScene, { id: orgID });
         });
-   
-    }
 
-    override async enterScene(ctx: BotContext) {
-        super.enterScene(ctx);
+        this.enter(async (ctx) => {
+            const btns = createInlineButtons([this.btnGoHome, ]);
+            await this.setButtons(ctx, `Поиск организации\nвведите ИНН или наименование:`, [ btns]);
+            await this.showButtons(ctx);
+            return ctx.wizard.next();
+        });   
     }
 }

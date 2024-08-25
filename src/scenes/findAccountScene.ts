@@ -1,50 +1,48 @@
 // src/scenes/findAccountScene.ts
-import { Scenes, Markup } from 'telegraf';
-import { BotContext } from '../types/customContext';
-import { InlineKeyboardButton } from 'telegraf/types';
+import { createInlineButtons } from '../utils/helpers';
 import { findInvoices } from '../utils/dataProvider';
 import { TypeScene } from '../config/constants';
+import { BaseScene } from './baseScene';
 
-const findAccountScene = new Scenes.WizardScene<BotContext>(
-    TypeScene.FindAccountScene,
-    async (ctx) => {
-        const findMessage = await ctx.reply(
-            `Поиск ЛС\nвведите номер лицевого счета:`);
-        //await saveMessages(ctx, [findMessage.message_id]);
-        return ctx.wizard.next();
+export class FindAccountScene extends BaseScene {
+    constructor() {
+        super(
+            TypeScene.FindAccountScene,
+            async (ctx) => {
+                const userInput = (ctx.message as { text: string })?.text;
+                if (!userInput) {
+                    ctx.reply('Ошибка ввода. Введите верный номер ЛС:');
+                    return;
+                }
+                const orgID = this.contextData.id;
+                const foundInvoices = findInvoices(orgID, userInput);
+                if (foundInvoices === undefined || foundInvoices.length == 0) {
+                    ctx.reply('Лицевой счет не ненайден. Повторите попытку:');
+                } else {
+                    const buttons = createInlineButtons(
+                        foundInvoices.map(function(item){ 
+                            return {text: `${item.type} ${item.amount / 100} за ${item.period}`, 
+                            callback_data: `invoice|${item.id}`}}
+                        )
+                    );
+                    await this.setButtons(ctx, `Ваши квитанции:`, buttons);
+                    await this.showButtons(ctx);
+                }
+            }
+        );
 
-    },
-    async (ctx) => {
-        let messages: Array<number> = [];
-        const userInput = (ctx.message as { text: string })?.text;
-        if (!userInput) {
-            ctx.reply('Ошибка ввода. Введите верный номер ЛС:');
-            return;
-        }
-        let buttons: Array<Array<InlineKeyboardButton.CallbackButton>> = [];
-        const { orgID } = ctx.scene.state as { orgID: string };
-        const foundInvoices = findInvoices(orgID, userInput);
-        if (foundInvoices === undefined || foundInvoices.length == 0) {
-            ctx.reply('Лицевой счет не ненайден. Повторите попытку:');
-        } else {
-            //.ctx.data.session = foundInvoices;
-            foundInvoices.forEach(item => {
-                buttons.push(
-                    [Markup.button.callback(`${item.type} ${item.amount / 100} за ${item.period}`, `invoice|${item.id}`)]
-                );
-            });
-            //buttons.push(btnBottom);
-            const orgMessage = await ctx.reply(`Ваши квитанции:`, Markup.inlineKeyboard(
-                buttons
-            ));
-            messages.push(orgMessage.message_id);
-        }
+        this.action(/invoice\|.+/, async (ctx) => {
+            const invId = ctx.match.input.split('|')[1];
+            this.pushScene(); // push this scene info into stack of scenes
+            await ctx.scene.enter(TypeScene.InvoiceScene, { id: invId });
+        });
+
+        this.enter(async (ctx) => {
+            this.contextData = ctx.scene.state as {id: string};
+            const btns = createInlineButtons([this.btnGoBack, this.btnGoHome, ]);
+            await this.setButtons(ctx, `Поиск ЛС\nвведите номер лицевого счета:`, [ btns]);
+            await this.showButtons(ctx);
+            return ctx.wizard.next();
+        });   
     }
-);
-
-findAccountScene.action(/invoice\|.+/, async (ctx) => {
-    const invId = ctx.match.input.split('|')[1];
-    await ctx.scene.enter(TypeScene.InvoiceScene, { id: invId });
-});
-
-export default findAccountScene;
+}

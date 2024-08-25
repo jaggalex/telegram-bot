@@ -5,6 +5,7 @@ import { MainScene } from './mainScene';
 import { AddressScene } from './addressScene';
 import { InvoiceScene } from './invoiceScene';
 import { FindOrgScene }  from './findOrgScene';
+import { FindAccountScene } from './findAccountScene';
 
 
 export function setupScenes(bot: Telegraf<BotContext>) {
@@ -12,7 +13,8 @@ export function setupScenes(bot: Telegraf<BotContext>) {
         new MainScene(),
         new AddressScene(),
         new InvoiceScene(),
-        new FindOrgScene()
+        new FindOrgScene(),
+        new FindAccountScene()
     ]);
 
     bot.use(stage.middleware());

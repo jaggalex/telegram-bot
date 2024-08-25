@@ -8,7 +8,7 @@ import { findAddressByID, findInvoices, getAccountByAddress } from '../utils/dat
 
 export class AddressScene extends BaseScene {
     constructor() {
-    super(TypeScene.AddressScene, async (ctx) => { return ctx.wizard.next() });
+        super(TypeScene.AddressScene, async (ctx) => { return ctx.wizard.next() });
     }
 
     override async enterScene(ctx: BotContext) {
