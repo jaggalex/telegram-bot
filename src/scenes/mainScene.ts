@@ -8,9 +8,13 @@ import { getAddressList, IAddress } from '../utils/dataProvider';
 export class MainScene extends BaseScene {
 
     constructor() {
-        super(TypeScene.MainScene, async (ctx) => { return ctx.wizard.next() });
+        super(TypeScene.MainScene,
+            async (ctx) => {
+                return ctx.wizard.next();
+            }
+        );
     }
-    
+
     override async enterScene(ctx: BotContext) {
         super.enterScene(ctx);
         const chatId = ctx.chat?.id;
@@ -18,15 +22,15 @@ export class MainScene extends BaseScene {
             let addresses: Array<IAddress> = [];
 
             addresses = getAddressList(chatId);
-            const btn = addresses.map(function(item){ 
-                return {text: item.address, callback_data: `address|${item.id}`}
+            const btn = addresses.map(function (item) {
+                return { text: item.address, callback_data: `address|${item.id}` }
             })
             const buttons = createInlineButtons(btn);
 
-            await this.setButtons(ctx, 'Адреса:', [...buttons, ]);
+            await this.setButtons(ctx, 'Адреса:', [...buttons,]);
             await this.showButtons(ctx);
 
-            await this.setButtons(ctx, 'Добавить еще', 
+            await this.setButtons(ctx, 'Добавить еще',
                 createInlineButtons([{ text: 'Найти', callback_data: 'find_org' }])
             );
             await this.showButtons(ctx);
@@ -34,15 +38,15 @@ export class MainScene extends BaseScene {
             this.action(/address\|.+/, async (ctx) => {
                 const addressId = ctx.match.input.split('|')[1];
                 this.pushScene(); // push this scene info into stack of scenes
-                await ctx.scene.enter(TypeScene.AddressScene,  { id: addressId });
+                await ctx.scene.enter(TypeScene.AddressScene, { id: addressId });
             });
 
             this.action('find_org', async () => {
-                this.pushScene(); 
+                this.pushScene();
                 await ctx.scene.enter(TypeScene.FindOrgScene);
             });
-        } else { 
-            ctx.reply('Chat ID is undefined!') 
+        } else {
+            ctx.reply('Chat ID is undefined!')
         };
     }
 }

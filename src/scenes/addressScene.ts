@@ -8,7 +8,10 @@ import { findAddressByID, findInvoices, getAccountByAddress } from '../utils/dat
 
 export class AddressScene extends BaseScene {
     constructor() {
-        super(TypeScene.AddressScene, async (ctx) => { return ctx.wizard.next() });
+        super(TypeScene.AddressScene,
+            async (ctx) => {
+                return ctx.wizard.next()
+            });
     }
 
     override async enterScene(ctx: BotContext) {
@@ -26,9 +29,12 @@ export class AddressScene extends BaseScene {
                 const foundInvoices = findInvoices(acc.org_id, acc.account);
                 if (foundInvoices !== undefined && foundInvoices.length > 0) {
                     const buttons = createInlineButtons(
-                        foundInvoices.map(function(item){ 
-                            return {text: `${item.type} ${formatCurrency(item.amount)} за ${item.period}`, 
-                            callback_data: `invoice|${item.id}`}}
+                        foundInvoices.map(function (item) {
+                            return {
+                                text: `${item.type} ${formatCurrency(item.amount)} за ${item.period}`,
+                                callback_data: `invoice|${item.id}`
+                            }
+                        }
                         )
                     );
                     await this.setButtons(ctx, `ЛС: ${acc.account}`, buttons);

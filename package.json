@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node --trace-deprecation ./dist/src/index.js",
+    "start": "node --max-old-space-size=4096 ./dist/src/index.js",
+    "debug": "ts-node  ./src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -20,6 +21,7 @@
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
   "devDependencies": {
-    "@types/node": "^22.4.1"
+    "@types/node": "^22.4.1",
+    "ts-node": "^10.9.2"
   }
 }

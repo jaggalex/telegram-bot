@@ -14,7 +14,10 @@ if (BOT_TOKEN) {
     setupScenes(bot);
     // Launch the bot
     bot.launch();
-    bot.start((ctx) => ctx.scene.enter(TypeScene.MainScene));
+    bot.start((ctx) => {
+        console.log('run /start');
+        ctx.scene.enter(TypeScene.MainScene);
+    });
     // Graceful stop
     process.once('SIGINT', () => bot.stop('SIGINT'));
     process.once('SIGTERM', () => bot.stop('SIGTERM'));

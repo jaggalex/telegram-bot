@@ -6,8 +6,11 @@ import { BaseScene } from './baseScene';
 
 export class FindAccountScene extends BaseScene {
     constructor() {
-        super(
-            TypeScene.FindAccountScene,
+        super(TypeScene.FindAccountScene,
+            async (ctx) => {
+                await ctx.reply(`Поиск ЛС\nвведите номер лицевого счета:`);
+                return ctx.wizard.next();
+            },
             async (ctx) => {
                 const userInput = (ctx.message as { text: string })?.text;
                 if (!userInput) {
@@ -20,9 +23,12 @@ export class FindAccountScene extends BaseScene {
                     ctx.reply('Лицевой счет не ненайден. Повторите попытку:');
                 } else {
                     const buttons = createInlineButtons(
-                        foundInvoices.map(function(item){ 
-                            return {text: `${item.type} ${item.amount / 100} за ${item.period}`, 
-                            callback_data: `invoice|${item.id}`}}
+                        foundInvoices.map(function (item) {
+                            return {
+                                text: `${item.type} ${item.amount / 100} за ${item.period}`,
+                                callback_data: `invoice|${item.id}`
+                            }
+                        }
                         )
                     );
                     await this.setButtons(ctx, `Ваши квитанции:`, buttons);
@@ -36,13 +42,5 @@ export class FindAccountScene extends BaseScene {
             this.pushScene(); // push this scene info into stack of scenes
             await ctx.scene.enter(TypeScene.InvoiceScene, { id: invId });
         });
-
-        this.enter(async (ctx) => {
-            this.contextData = ctx.scene.state as {id: string};
-            const btns = createInlineButtons([this.btnGoBack, this.btnGoHome, ]);
-            await this.setButtons(ctx, `Поиск ЛС\nвведите номер лицевого счета:`, [ btns]);
-            await this.showButtons(ctx);
-            return ctx.wizard.next();
-        });   
     }
 }

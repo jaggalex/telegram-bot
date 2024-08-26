@@ -2,7 +2,7 @@ import { Composer } from "telegraf";
 import { BotContext, SceneContext } from "../types/customContext";
 import { TypeScene } from "../config/constants";
 
-const mainScene: SceneContext = {sceneName: TypeScene.MainScene, contextData: {}};
+const mainScene: SceneContext = { sceneName: TypeScene.MainScene, contextData: {} };
 
 export class SceneComposer extends Composer<BotContext> {
     private static instance: SceneComposer;
