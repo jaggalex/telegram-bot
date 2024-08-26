@@ -6,7 +6,8 @@ import { BotContext, SceneContext } from '../types/customContext';
 import { TypeScene,  BUTTON_TEXTS } from '../config/constants';
 import { SceneComposer } from '../middleware/composer';
 
-export class BaseScene extends Scenes.WizardScene<BotContext> { // Scenes.BaseScene<BotContext> {
+
+export abstract class BaseScene extends Scenes.WizardScene<BotContext> { // Scenes.BaseScene<BotContext> {
     private composer: SceneComposer;
     promises: Promise<Message.TextMessage>[] = [];
     messageIds: Array<number> = [];
@@ -16,8 +17,8 @@ export class BaseScene extends Scenes.WizardScene<BotContext> { // Scenes.BaseSc
     btnGoHome = {text: BUTTON_TEXTS.HOME, callback_data: 'home'};
     btnsGoBackGoHome = [this.btnGoBack, this.btnGoHome];
 
-    constructor(sceneId: string, ...steps: Array<Middleware<BotContext>>) {
-        super(sceneId, ...steps);
+    constructor(id: string, ...steps: Array<Middleware<BotContext>>) {
+        super(id, ...steps);
         this.composer = SceneComposer.getInstance();
         this.enter((ctx) => this.enterScene(ctx));
         this.leave((ctx) => this.leaveScene(ctx));
