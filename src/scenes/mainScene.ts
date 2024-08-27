@@ -8,11 +8,7 @@ import { getAddressList, IAddress } from '../utils/dataProvider';
 export class MainScene extends BaseScene {
 
     constructor() {
-        super(TypeScene.MainScene,
-            async (ctx) => {
-                return ctx.wizard.next();
-            }
-        );
+        super(TypeScene.MainScene);
     }
 
     override async enterScene(ctx: BotContext) {
@@ -27,13 +23,13 @@ export class MainScene extends BaseScene {
             })
             const buttons = createInlineButtons(btn);
 
-            await this.setButtons(ctx, 'Адреса:', [...buttons,]);
-            await this.showButtons(ctx);
+            this.setButtons(ctx, 'Адреса:', [...buttons,]);
+            await this.showButtons();
 
-            await this.setButtons(ctx, 'Добавить еще',
+            this.setButtons(ctx, 'Добавить еще',
                 createInlineButtons([{ text: 'Найти', callback_data: 'find_org' }])
             );
-            await this.showButtons(ctx);
+            await this.showButtons();
 
             this.action(/address\|.+/, async (ctx) => {
                 const addressId = ctx.match.input.split('|')[1];

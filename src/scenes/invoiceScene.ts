@@ -7,10 +7,7 @@ import { findInvoiceByID } from '../utils/dataProvider'
 
 export class InvoiceScene extends BaseScene {
     constructor() {
-        super(TypeScene.InvoiceScene,
-            async (ctx) => {
-                return ctx.wizard.next()
-            });
+        super(TypeScene.InvoiceScene);
     }
 
     override async enterScene(ctx: BotContext) {
@@ -30,12 +27,12 @@ export class InvoiceScene extends BaseScene {
                 { text: 'Оплатить', url: `https://v1.doma.ai` },
             ], { one_line: true });
             const btns = createInlineButtons([this.btnGoBack, this.btnGoHome,], { one_line: true });
-            await this.setButtons(ctx, inv, [buttons, btns]);
+            this.setButtons(ctx, inv, [buttons, btns]);
         } else {
             throw new Error(`Invoice Id not found!`);
         }
 
-        await this.showButtons(ctx);
+        await this.showButtons();
     }
 
 }

@@ -1,10 +1,13 @@
 // src/scenes/findAccountScene.ts
+import { Scenes } from 'telegraf';
+import { BotContext } from '../types/customContext';
 import { createInlineButtons } from '../utils/helpers';
 import { findInvoices } from '../utils/dataProvider';
 import { TypeScene } from '../config/constants';
-import { BaseScene } from './baseScene';
+import { SceneComposer } from '../middleware/composer';
 
-export class FindAccountScene extends BaseScene {
+export class FindAccountScene extends Scenes.WizardScene<BotContext> {
+    private composer: SceneComposer;
     constructor() {
         super(TypeScene.FindAccountScene,
             async (ctx) => {
@@ -12,35 +15,26 @@ export class FindAccountScene extends BaseScene {
                 return ctx.wizard.next();
             },
             async (ctx) => {
+                const initData = ctx.scene.state as { id: string };
                 const userInput = (ctx.message as { text: string })?.text;
-                if (!userInput) {
-                    ctx.reply('Ошибка ввода. Введите верный номер ЛС:');
-                    return;
-                }
-                const orgID = this.contextData.id;
-                const foundInvoices = findInvoices(orgID, userInput);
+                const foundInvoices = findInvoices(initData.id, userInput);
                 if (foundInvoices === undefined || foundInvoices.length == 0) {
                     ctx.reply('Лицевой счет не ненайден. Повторите попытку:');
                 } else {
                     const buttons = createInlineButtons(
                         foundInvoices.map(function (item) {
-                            return {
-                                text: `${item.type} ${item.amount / 100} за ${item.period}`,
-                                callback_data: `invoice|${item.id}`
-                            }
-                        }
-                        )
+                            return { text: `${item.type} ${item.amount / 100} за ${item.period}`, callback_data: `invoice|${item.id}` }
+                        })
                     );
-                    await this.setButtons(ctx, `Ваши квитанции:`, buttons);
-                    await this.showButtons(ctx);
+                    this.composer.setButtons(ctx, `Ваши квитанции:`, buttons);
+                    await this.composer.showButtons();
                 }
             }
         );
-
+        this.composer = SceneComposer.getInstance();
         this.action(/invoice\|.+/, async (ctx) => {
             const invId = ctx.match.input.split('|')[1];
-            this.pushScene(); // push this scene info into stack of scenes
-            await ctx.scene.enter(TypeScene.InvoiceScene, { id: invId });
+            ctx.scene.enter(TypeScene.InvoiceScene, { id: invId });
         });
     }
 }

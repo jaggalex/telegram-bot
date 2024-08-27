@@ -8,10 +8,7 @@ import { findAddressByID, findInvoices, getAccountByAddress } from '../utils/dat
 
 export class AddressScene extends BaseScene {
     constructor() {
-        super(TypeScene.AddressScene,
-            async (ctx) => {
-                return ctx.wizard.next()
-            });
+        super(TypeScene.AddressScene);
     }
 
     override async enterScene(ctx: BotContext) {
@@ -20,8 +17,8 @@ export class AddressScene extends BaseScene {
         if (addressId) {
             const { ...address } = findAddressByID(addressId);
 
-            await this.setButtons(ctx, `Адрес: ${address.address}`, createInlineButtons([this.btnGoHome]));
-            await this.showButtons(ctx);
+            this.setButtons(ctx, `Адрес: ${address.address}`, createInlineButtons([this.btnGoHome]));
+            await this.showButtons();
 
             const accounts = getAccountByAddress(ctx.msg.chat.id, this.contextData.id);
 
@@ -37,11 +34,11 @@ export class AddressScene extends BaseScene {
                         }
                         )
                     );
-                    await this.setButtons(ctx, `ЛС: ${acc.account}`, buttons);
+                    this.setButtons(ctx, `ЛС: ${acc.account}`, buttons);
                 };
             }));
 
-            await this.showButtons(ctx);
+            await this.showButtons();
 
             this.action(/invoice\|.+/, async (ctx) => {
                 const invoiceId = ctx.match.input.split('|')[1];

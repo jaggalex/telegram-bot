@@ -1,29 +1,26 @@
 // src/scenes/baseScene.ts
 import { Scenes } from 'telegraf';
-import { Message } from 'telegraf/typings/core/types/typegram';
+import { SceneOptions } from 'telegraf/typings/scenes/base';
 import { BotContext } from '../types/customContext';
-import { TypeScene, BUTTON_TEXTS } from '../config/constants';
+import { BUTTON_TEXTS } from '../config/constants';
 import { SceneComposer } from '../middleware/composer';
 
 
-export abstract class BaseScene extends Scenes.WizardScene<BotContext> {
+export abstract class BaseScene extends Scenes.BaseScene<BotContext> {
     private composer: SceneComposer;
-    promises: Promise<Message.TextMessage>[] = [];
-    messageIds: Array<number> = [];
+    //    promises: Promise<Message.TextMessage>[] = [];
+    //    messageIds: Array<number> = [];
     contextData = { id: '' };
 
     btnGoBack = { text: BUTTON_TEXTS.BACK, callback_data: 'back' };
     btnGoHome = { text: BUTTON_TEXTS.HOME, callback_data: 'home' };
     btnsGoBackGoHome = [this.btnGoBack, this.btnGoHome];
 
-    constructor(sceneId: string, ...steps: Array<(ctx: BotContext) => any>) {
-        super(sceneId, ...steps);
+    constructor(id: string, options?: SceneOptions<BotContext>) {
+        super(id, options);
         this.composer = SceneComposer.getInstance();
         this.use(this.composer.middleware());
-        this.use(async (ctx, next) => {
-            await this.enterScene(ctx);
-            next();
-        });
+        this.enter((ctx) => this.enterScene(ctx));
         this.leave((ctx) => this.leaveScene(ctx));
     }
 
@@ -32,28 +29,20 @@ export abstract class BaseScene extends Scenes.WizardScene<BotContext> {
     }
 
     protected async pushScene() {
-        const scene = { sceneName: this.id as TypeScene, contextData: this.contextData }
-        this.composer.pushScene(scene);
+        this.composer.pushScene(this.id, this.contextData);
     }
 
     protected async leaveScene(ctx: BotContext) {
-        while (this.messageIds.length > 0) {
-            let id = this.messageIds.pop();
-            await ctx.deleteMessage(id).catch(() => { });
-        }
+        await this.composer.clearMessages(ctx);
     }
 
     // Common method to set inline buttons, finaly run showButtons()
-    protected async setButtons(ctx: BotContext, title: string, buttons: any) {
-        this.promises.push(ctx.reply(
-            title, { parse_mode: 'HTML', reply_markup: { inline_keyboard: buttons } }
-        ));
+    protected setButtons(ctx: BotContext, title: string, buttons: any) {
+        this.composer.setButtons(ctx, title, buttons);
     }
 
     // Common method to show buttons
-    protected async showButtons(ctx: BotContext) {
-        const messages: Message.TextMessage[] = await Promise.all(this.promises);
-        messages.forEach(msg => this.messageIds.push(msg.message_id));
-        this.promises = [];
+    protected async showButtons() {
+        await this.composer.showButtons();
     }
 }

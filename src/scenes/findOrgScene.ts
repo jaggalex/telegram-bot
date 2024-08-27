@@ -1,10 +1,13 @@
 // src/scenes/findOrgScene.ts
+import { Scenes } from 'telegraf';
+import { BotContext } from '../types/customContext';
 import { createInlineButtons } from '../utils/helpers';
 import { findOrg } from '../utils/dataProvider';
 import { TypeScene } from '../config/constants';
-import { BaseScene } from './baseScene';
+import { SceneComposer } from '../middleware/composer';
 
-export class FindOrgScene extends BaseScene {
+export class FindOrgScene extends Scenes.WizardScene<BotContext> {
+    private composer: SceneComposer;
     constructor() {
         super(TypeScene.FindOrgScene,
             async (ctx) => {
@@ -12,7 +15,6 @@ export class FindOrgScene extends BaseScene {
                 return ctx.wizard.next();
             },
             async (ctx) => {
-                let messages: Array<number> = [];
                 const userInput = (ctx.message as { text: string })?.text;
                 const foundOrgs = findOrg(userInput);
                 if (foundOrgs === undefined || foundOrgs.length == 0) {
@@ -20,23 +22,18 @@ export class FindOrgScene extends BaseScene {
                 } else {
                     const buttons = createInlineButtons(
                         foundOrgs.map(function (item) {
-                            return {
-                                text: `${item.name}`,
-                                callback_data: `organization|${item.id}`
-                            }
-                        }
-                        )
+                            return { text: `${item.name}`, callback_data: `organization|${item.id}` }
+                        })
                     );
-                    await this.setButtons(ctx, `Выберите организацию:`, buttons);
-                    await this.showButtons(ctx);
+                    this.composer.setButtons(ctx, `Выберите организацию:`, buttons);
+                    await this.composer.showButtons();
                 }
             },
         );
-
+        this.composer = SceneComposer.getInstance();
         this.action(/organization\|.+/, async (ctx) => {
             const orgID = ctx.match.input.split('|')[1];
-            this.pushScene(); // push this scene info into stack of scenes
-            await ctx.scene.enter(TypeScene.FindAccountScene, { id: orgID });
+            ctx.scene.enter(TypeScene.FindAccountScene, { id: orgID });
         });
     }
 }
