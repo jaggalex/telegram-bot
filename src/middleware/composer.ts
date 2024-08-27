@@ -58,11 +58,4 @@ export class SceneComposer extends Composer<BotContext> {
             await ctx.deleteMessage(id).catch(() => { });
         }
     }
-
-    // middleware() {
-    //     return async (ctx: BotContext, next: Function) => {
-    //         await next(); // Ensure the middleware chain continues
-    //     };
-    // }
-
 }
