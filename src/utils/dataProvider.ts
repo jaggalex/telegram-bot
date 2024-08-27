@@ -1,3 +1,4 @@
+// src/utils/dataProvider.ts
 import serviceConsumer from '../../data/serviceConsumer.json';
 import address from '../../data/address.json';
 import org from '../../data/org.json';

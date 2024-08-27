@@ -1,4 +1,4 @@
-7// src/scenes/addressScene.ts
+// src/scenes/addressScene.ts
 import { BotContext } from "../types/customContext";
 import { BaseScene } from './baseScene';
 import { TypeScene } from "../config/constants";

@@ -1,3 +1,4 @@
+// src/middleware/composer.ts
 import { Composer } from "telegraf";
 import { BotContext, SceneContext } from "../types/customContext";
 import { TypeScene } from "../config/constants";
@@ -51,7 +52,7 @@ export class SceneComposer extends Composer<BotContext> {
         this.promises = [];
     }
 
-    // Common method to show buttons
+    // Clear all saved messages
     public async clearMessages(ctx: BotContext) {
         while (this.messageIds.length > 0) {
             let id = this.messageIds.pop();

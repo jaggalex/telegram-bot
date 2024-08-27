@@ -8,8 +8,6 @@ import { SceneComposer } from '../middleware/composer';
 
 export abstract class BaseScene extends Scenes.BaseScene<BotContext> {
     private composer: SceneComposer;
-    //    promises: Promise<Message.TextMessage>[] = [];
-    //    messageIds: Array<number> = [];
     contextData = { id: '' };
 
     btnGoBack = { text: BUTTON_TEXTS.BACK, callback_data: 'back' };
