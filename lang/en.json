@@ -1,0 +1,20 @@
+{
+    "address_list": "Addresses:",
+    "address_address": "Address: {{ address }}",
+    "account": "Account: {{ account }}",
+    "btn_add_more": "Add more",
+    "btn_back": "Back",
+    "btn_find": "Find",
+    "btn_home": "Home",
+    "btn_pdf": "Pdf",
+    "btn_pay": "Pay",
+    "btn_save": "Save",
+    "got_empty_address_id": "Got empty address id!",
+    "common_error": "An error occurred: {{ errorDetails }}.",
+    "inv_id_not_found": "Invoice Id not found!",
+    "inv_header_type_amount_period": "{{ type }} {{ amount }} per {{ period }}",
+    "inv_doc_type_account_period_amount": "<b>Bill to pay</b>\n'{{ type }}' <b>account</b>: {{ account }}\nperiod: {{ period }}\namount to pay: {{amount}}",
+    "inv_item_name_amount": "\n\t\t<i>{{ name }}: {{ amount }}</i>",
+    "undefined_chat_id": "Chat ID is undefined!",
+    "welcome": "Hello, {{ name }}! Welcome to our service."
+}

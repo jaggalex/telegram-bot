@@ -1,0 +1,20 @@
+{
+    "address_list": "Адреса:",
+    "address_address": "Адрес: {{ address }}",
+    "account": "ЛС: {{ account }}",
+    "btn_add_more": "Добавить еще",
+    "btn_back": "Назад",
+    "btn_find": "Найти",
+    "btn_home": "Домой",
+    "btn_pdf": "Pdf",
+    "btn_pay": "Оплатить",
+    "btn_save": "Добавить",
+    "got_empty_address_id": "Получен пустой идентификатор адреса!",
+    "common_error": "Обнаружена ошибка: {{ errorDetails }}.",
+    "inv_id_not_found": "Идентификатор квитанции не найден!",
+    "inv_doc_type_account_period_amount": "<b>Квитанция на оплату</b>\n'{{ type }}' <b>ЛС</b>: {{ account }}\nпериод: {{ period }}\nсумма к оплате: {{amount}}",
+    "inv_header_type_amount_period": "{{ type }} {{ amount }} за {{ period }}",
+    "inv_item_name_amount": "\n\t\t<i>{{ name }}: {{ amount }}</i>",
+    "undefined_chat_id": "Идентификатор чата не определен!",
+    "welcome": "Добрый день, {{ name }}! Добро пожаловать в сервис оплат."
+}
