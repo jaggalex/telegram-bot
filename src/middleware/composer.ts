@@ -3,8 +3,7 @@ import { Composer } from "telegraf";
 import { BotContext, SceneContext } from "../types/customContext";
 import { TypeScene } from "../config/constants";
 import { Message } from 'telegraf/typings/core/types/typegram';
-
-const mainScene: SceneContext = { sceneName: TypeScene.MainScene, contextData: {} };
+import LocalizationHelper from '../locale/localizationHelper';
 
 export class SceneComposer extends Composer<BotContext> {
     private static instance: SceneComposer;
@@ -21,13 +20,11 @@ export class SceneComposer extends Composer<BotContext> {
         this.action('back', async (ctx) => {
             const scene = this.stackScenes.pop();
             await ctx.scene.enter(scene?.sceneName || TypeScene.MainScene, scene?.contextData || {});
-            //return ctx.wizard.next();
         });
     }
 
     public pushScene(sceneId: string, data: {} = {}) {
         const scene = { sceneName: sceneId as TypeScene, contextData: data }
-
         this.stackScenes.push(scene);
     }
 

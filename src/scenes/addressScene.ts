@@ -2,9 +2,9 @@
 import { BotContext } from "../types/customContext";
 import { BaseScene } from './baseScene';
 import { TypeScene } from "../config/constants";
-import { formatCurrency, createInlineButtons } from '../utils/helpers';
+import { formatCurrency, createInlineButtons, createInlineButtonsByKeys } from '../utils/helpers';
 import { findAddressByID, findInvoices, getAccountByAddress } from '../utils/dataProvider'
-
+import { LABEL as LBL, ERRORS as ERR } from '../../lang/messages';
 
 export class AddressScene extends BaseScene {
     constructor() {
@@ -16,8 +16,10 @@ export class AddressScene extends BaseScene {
         const addressId = this.contextData.id;
         if (addressId) {
             const { ...address } = findAddressByID(addressId);
-
-            this.setButtons(ctx, `Адрес: ${address.address}`, createInlineButtons([this.btnGoHome]));
+            this.setButtons(ctx,
+                LBL.TEMPLATE.ADDRESS_ADDRESS,
+                { address: address.address },
+                createInlineButtonsByKeys(ctx, [this.btnGoHome]));
             await this.showButtons();
 
             const accounts = getAccountByAddress(ctx.msg.chat.id, this.contextData.id);
@@ -27,14 +29,21 @@ export class AddressScene extends BaseScene {
                 if (foundInvoices !== undefined && foundInvoices.length > 0) {
                     const buttons = createInlineButtons(
                         foundInvoices.map(function (item) {
+                            const amount = ctx.localizationHelper.formatCurrency(item.amount);
+                            const label = ctx.localizationHelper.render(LBL.TEMPLATE.INVOICE_HEADER_TYPE_AMOUNT_PERIOD, {
+                                type: item.type,
+                                amount: amount,
+                                period: item.period
+                            });
                             return {
-                                text: `${item.type} ${formatCurrency(item.amount)} за ${item.period}`,
+                                text: label,
                                 callback_data: `invoice|${item.id}`
                             }
                         }
                         )
                     );
-                    this.setButtons(ctx, `ЛС: ${acc.account}`, buttons);
+
+                    this.setButtons(ctx, LBL.TEMPLATE.ACCOUNT, { account: acc.account }, buttons);
                 };
             }));
 
@@ -46,7 +55,7 @@ export class AddressScene extends BaseScene {
                 await ctx.scene.enter(TypeScene.InvoiceScene, { id: invoiceId });
             });
         } else {
-            throw new Error('Got empty address id!');
+            throw new Error(this.lnMsg(ctx, ERR.EMPTY_ADDRESS_ID));
         }
     }
 }

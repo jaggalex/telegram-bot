@@ -8,6 +8,13 @@
         "skipLibCheck": true,
         "outDir": "./dist"
     },
-    "include": ["src/**/*", "data"],
-    "exclude": ["node_modules"]
+    "include": [
+        "src/**/*",
+        "data/",
+        "lang/*.json",
+        "lang/messages.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
 }

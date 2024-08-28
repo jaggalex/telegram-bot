@@ -1,19 +1,20 @@
 // src/scenes/baseScene.ts
 import { Scenes } from 'telegraf';
 import { SceneOptions } from 'telegraf/typings/scenes/base';
-import { BotContext } from '../types/customContext';
-import { BUTTON_TEXTS } from '../config/constants';
+import { BotContext, InlineCallbackButton, InlineUrlButton } from '../types/customContext';
 import { SceneComposer } from '../middleware/composer';
+import { LABEL as LBL, ERRORS as ERR } from '../../lang/messages';
 
 
 export abstract class BaseScene extends Scenes.BaseScene<BotContext> {
-    private composer: SceneComposer;
-    contextData = { id: '' };
-
-    btnGoBack = { text: BUTTON_TEXTS.BACK, callback_data: 'back' };
-    btnGoHome = { text: BUTTON_TEXTS.HOME, callback_data: 'home' };
-    btnsGoBackGoHome = [this.btnGoBack, this.btnGoHome];
-
+    protected composer: SceneComposer;
+    protected contextData = { id: '' };
+    protected btnGoHome: InlineCallbackButton = {
+        key: LBL.BUTTON.HOME, callback_data: 'home'
+    };
+    protected btnGoBack: InlineCallbackButton = {
+        key: LBL.BUTTON.BACK, callback_data: 'back'
+    };
     constructor(id: string, options?: SceneOptions<BotContext>) {
         super(id, options);
         this.composer = SceneComposer.getInstance();
@@ -35,12 +36,18 @@ export abstract class BaseScene extends Scenes.BaseScene<BotContext> {
     }
 
     // Common method to set inline buttons, finaly run showButtons()
-    protected setButtons(ctx: BotContext, title: string, buttons: any) {
-        this.composer.setButtons(ctx, title, buttons);
+    protected setButtons(ctx: BotContext, title: string, contextMessage: object = {}, buttons: any) {
+        const lnTitle = this.lnMsg(ctx, title, contextMessage);
+        this.composer.setButtons(ctx, lnTitle, buttons);
     }
 
     // Common method to show buttons
     protected async showButtons() {
         await this.composer.showButtons();
     }
+
+    protected lnMsg(ctx: BotContext, key: string, contextMessage: {} = {}) {
+        return ctx.localizationHelper.render(key, contextMessage);
+    }
+
 }

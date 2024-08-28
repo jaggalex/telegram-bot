@@ -4,6 +4,7 @@ import { BotContext } from '../types/customContext';
 import { createInlineButtons } from '../utils/helpers';
 import { TypeScene } from '../config/constants';
 import { getAddressList, IAddress } from '../utils/dataProvider';
+import { LABEL as LBL } from '../../lang/messages';
 
 export class MainScene extends BaseScene {
 
@@ -23,11 +24,13 @@ export class MainScene extends BaseScene {
             })
             const buttons = createInlineButtons(btn);
 
-            this.setButtons(ctx, 'Адреса:', [...buttons,]);
+            this.setButtons(ctx, LBL.MESSAGE.ADDRESS_LIST, {}, [...buttons,]);
             await this.showButtons();
 
-            this.setButtons(ctx, 'Добавить еще',
-                createInlineButtons([{ text: 'Найти', callback_data: 'find_org' }])
+            const bntName = this.lnMsg(ctx, LBL.BUTTON.FIND);
+
+            this.setButtons(ctx, LBL.BUTTON.ADD_MORE, {},
+                createInlineButtons([{ text: bntName, callback_data: 'find_org' }])
             );
             await this.showButtons();
 
@@ -42,7 +45,7 @@ export class MainScene extends BaseScene {
                 await ctx.scene.enter(TypeScene.FindOrgScene);
             });
         } else {
-            ctx.reply('Chat ID is undefined!')
+            ctx.reply(this.lnMsg(ctx, LBL.BUTTON.FIND))
         };
     }
 }
