@@ -8,7 +8,7 @@ export function setupMiddleware(bot: Telegraf<BotContext>) {
     bot.use(session());
     bot.use(sessionMiddleware());
     bot.use((ctx, next) => {
-        ctx.localizationHelper = new LocalizationHelper(ctx.from?.language_code || 'en');
+        ctx.lh = new LocalizationHelper(ctx.from?.language_code || 'en');
         return next();
     });
 }

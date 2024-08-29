@@ -36,9 +36,8 @@ export abstract class BaseScene extends Scenes.BaseScene<BotContext> {
     }
 
     // Common method to set inline buttons, finaly run showButtons()
-    protected setButtons(ctx: BotContext, title: string, contextMessage: object = {}, buttons: any) {
-        const lnTitle = this.lnMsg(ctx, title, contextMessage);
-        this.composer.setButtons(ctx, lnTitle, buttons);
+    protected setButtons(ctx: BotContext, title: string, buttons: any) {
+        this.composer.setButtons(ctx, title, buttons);
     }
 
     // Common method to show buttons
@@ -46,8 +45,8 @@ export abstract class BaseScene extends Scenes.BaseScene<BotContext> {
         await this.composer.showButtons();
     }
 
-    protected lnMsg(ctx: BotContext, key: string, contextMessage: {} = {}) {
-        return ctx.localizationHelper.render(key, contextMessage);
-    }
-
+    // protected render(ctx: BotContext, key: string, context: {} = {}) {
+    //     return ctx.lh.render(key, context);
+    // }
 }
+

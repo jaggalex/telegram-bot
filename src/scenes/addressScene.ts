@@ -17,8 +17,9 @@ export class AddressScene extends BaseScene {
         if (addressId) {
             const { ...address } = findAddressByID(addressId);
             this.setButtons(ctx,
-                LBL.TEMPLATE.ADDRESS_ADDRESS,
-                { address: address.address },
+                ctx.lh.render(
+                    LBL.TEMPLATE.ADDRESS_ADDRESS,
+                    { address: address.address }),
                 createInlineButtonsByKeys(ctx, [this.btnGoHome]));
             await this.showButtons();
 
@@ -29,12 +30,14 @@ export class AddressScene extends BaseScene {
                 if (foundInvoices !== undefined && foundInvoices.length > 0) {
                     const buttons = createInlineButtons(
                         foundInvoices.map(function (item) {
-                            const amount = ctx.localizationHelper.formatCurrency(item.amount);
-                            const label = ctx.localizationHelper.render(LBL.TEMPLATE.INVOICE_HEADER_TYPE_AMOUNT_PERIOD, {
-                                type: item.type,
-                                amount: amount,
-                                period: item.period
-                            });
+                            const amount = ctx.lh.formatCurrency(item.amount);
+                            const label = ctx.lh.render(
+                                LBL.TEMPLATE.INVOICE_HEADER_TYPE_AMOUNT_PERIOD,
+                                {
+                                    type: item.type,
+                                    amount: amount,
+                                    period: item.period
+                                });
                             return {
                                 text: label,
                                 callback_data: `invoice|${item.id}`
@@ -43,7 +46,12 @@ export class AddressScene extends BaseScene {
                         )
                     );
 
-                    this.setButtons(ctx, LBL.TEMPLATE.ACCOUNT, { account: acc.account }, buttons);
+                    this.setButtons(
+                        ctx,
+                        ctx.lh.render(
+                            LBL.TEMPLATE.ACCOUNT,
+                            { account: acc.account }),
+                        buttons);
                 };
             }));
 
@@ -55,7 +63,7 @@ export class AddressScene extends BaseScene {
                 await ctx.scene.enter(TypeScene.InvoiceScene, { id: invoiceId });
             });
         } else {
-            throw new Error(this.lnMsg(ctx, ERR.EMPTY_ADDRESS_ID));
+            throw new Error(ctx.lh.render(ERR.EMPTY_ADDRESS_ID));
         }
     }
 }

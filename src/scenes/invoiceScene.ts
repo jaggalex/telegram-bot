@@ -19,17 +19,17 @@ export class InvoiceScene extends BaseScene {
         if (invoice !== undefined) {
             let srv: string = '';
             invoice.services.forEach(s => {
-                const amount = ctx.localizationHelper.formatCurrency(s.amount);
-                srv += ctx.localizationHelper.render(LBL.TEMPLATE.INVOICE_ITEM_NAME_AMOUNT, {
+                const amount = ctx.lh.formatCurrency(s.amount);
+                srv += ctx.lh.render(LBL.TEMPLATE.INVOICE_ITEM_NAME_AMOUNT, {
                     name: s.name,
                     amount: amount
                 });
             });
-            let inv = ctx.localizationHelper.render(LBL.TEMPLATE.INVOICE_DOC_TYPE_ACCOUNT_PERIOD_AMOUNT, {
+            let inv = ctx.lh.render(LBL.TEMPLATE.INVOICE_DOC_TYPE_ACCOUNT_PERIOD_AMOUNT, {
                 type: invoice.type,
                 account: invoice.account,
                 period: invoice.period,
-                amount: ctx.localizationHelper.formatCurrency(invoice.amount)
+                amount: ctx.lh.formatCurrency(invoice.amount)
             });
             inv += srv;
             const buttons = createInlineButtonsByKeys(ctx,
@@ -44,7 +44,7 @@ export class InvoiceScene extends BaseScene {
                 ctx, [this.btnGoBack, this.btnGoHome], { one_line: true });
             this.composer.setButtons(ctx, inv, [buttons, btns]);
         } else {
-            throw new Error(this.lnMsg(ctx, ERR.INVOICE_ID_NOT_FOUND));
+            throw new Error(ctx.lh.render(ERR.INVOICE_ID_NOT_FOUND));
         }
 
         await this.showButtons();

@@ -12,6 +12,12 @@ export const LABEL = {
     MESSAGE: {
         ADDRESS_LIST: 'address_list',
         WELCOME: 'welcome',
+        INVATION_ACCOUNT_FIND: 'find_account_invitation',
+        INVATION_ORG_FIND: 'find_organization_invitation',
+        ACCOUNT_NOT_FOUND: 'account_not_found',
+        ORG_NOT_FOUND: 'org_not_found',
+        ORG_SELECT: 'select_org',
+        RECEIPTS: 'receipts',
     },
     TEMPLATE: {
         ACCOUNT: 'account',

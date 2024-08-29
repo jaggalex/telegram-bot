@@ -24,7 +24,7 @@ export interface Data {
 }
 
 export interface BotContext extends Context {
-    localizationHelper: LocalizationHelper;
+    lh: LocalizationHelper;
     data: Data;
     scene: Scenes.SceneContextScene<BotContext, Scenes.WizardSessionData>;
     wizard: Scenes.WizardContextWizard<BotContext>;
